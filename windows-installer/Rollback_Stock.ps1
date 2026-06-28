@@ -12,6 +12,33 @@ function Get-Sha256Hex([byte[]]$Bytes) {
     ).Replace('-', '')
 }
 
+function Set-ProtectedFirmwareRom {
+    param(
+        [Parameter(Mandatory)][string]$Destination,
+        [Parameter(Mandatory)][string]$Source
+    )
+
+    if (-not (Test-Path -LiteralPath $Source)) {
+        throw "Source ROM not found: $Source"
+    }
+
+    $destDir = Split-Path -Parent $Destination
+    if (-not (Test-Path -LiteralPath $destDir)) {
+        New-Item -ItemType Directory -Path $destDir -Force | Out-Null
+    }
+
+    if (Test-Path -LiteralPath $Destination) {
+        Write-Host "Unlocking protected firmware ROM (TrustedInstaller ACL)..."
+        cmd.exe /c "takeown.exe /f `"$Destination`" /a" 2>&1 | ForEach-Object { Write-Host $_ }
+        cmd.exe /c "icacls.exe `"$Destination`" /grant Administrators:F" 2>&1 | ForEach-Object { Write-Host $_ }
+        cmd.exe /c "icacls.exe `"$Destination`" /grant `"$env:USERNAME`:(F)`"" 2>&1 | ForEach-Object { Write-Host $_ }
+        attrib.exe -r -s -h $Destination 2>&1 | Out-Null
+        Remove-Item -LiteralPath $Destination -Force
+    }
+
+    Copy-Item -LiteralPath $Source -Destination $Destination -Force
+}
+
 if (-not (Test-Path $StockSource)) { throw 'FA506IV.320.STOCK not found.' }
 $stockBytes = [IO.File]::ReadAllBytes($StockSource)
 if ((Get-Sha256Hex $stockBytes) -ne $StockSha) { throw 'Stock ROM SHA mismatch.' }
@@ -23,7 +50,7 @@ Write-Host 'Reinstalling signed stock firmware package...'
 cmd.exe /c "pnputil.exe /delete-driver $SystemFirmware /uninstall /force" | Write-Host
 cmd.exe /c "pnputil.exe /add-driver `"$($infFile.FullName)`" /install" | Write-Host
 
-Copy-Item -Path $StockSource -Destination $FirmwareRom -Force
+Set-ProtectedFirmwareRom -Destination $FirmwareRom -Source $StockSource
 Write-Host 'Stock ROM staged. Reboot to restore original BIOS.'
 $answer = Read-Host 'Reboot now? (Y/N)'
 if ($answer -match '^[Yy]') {

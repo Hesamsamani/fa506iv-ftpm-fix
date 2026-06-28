@@ -11,7 +11,7 @@ $FirmwareGuid = '{1ddcfe17-12c6-5c0a-81a0-dd30045ce6aa}'
 $FirmwareDir = Join-Path $env:windir "Firmware\$FirmwareGuid"
 $FirmwareRom = Join-Path $FirmwareDir 'FA506IV.320'
 $StockSha = 'DC7E5984FB4A39DE84204F54F6D8A95B04DFECDF3AA32D45D0AA904272AD3273'
-$PatchedSha = '51CECB2BF48A58F224C55BB7210BABAED5B97DC72315BEA2CF1D0F26CD94759F'
+$PatchedSha = '37ED09073A01F2C6892603231BC9AB72164734ADD9D1D78A4D58E60E2049C316'
 
 function Get-Sha256Hex([byte[]]$Bytes) {
     [BitConverter]::ToString(
@@ -24,6 +24,33 @@ function Test-Administrator {
         [Security.Principal.WindowsIdentity]::GetCurrent()
     )
     return $principal.IsInRole([Security.Principal.WindowsBuiltInRole]::Administrator)
+}
+
+function Set-ProtectedFirmwareRom {
+    param(
+        [Parameter(Mandatory)][string]$Destination,
+        [Parameter(Mandatory)][string]$Source
+    )
+
+    if (-not (Test-Path -LiteralPath $Source)) {
+        throw "Source ROM not found: $Source"
+    }
+
+    $destDir = Split-Path -Parent $Destination
+    if (-not (Test-Path -LiteralPath $destDir)) {
+        New-Item -ItemType Directory -Path $destDir -Force | Out-Null
+    }
+
+    if (Test-Path -LiteralPath $Destination) {
+        Write-Host "Unlocking protected firmware ROM (TrustedInstaller ACL)..."
+        cmd.exe /c "takeown.exe /f `"$Destination`" /a" 2>&1 | ForEach-Object { Write-Host $_ }
+        cmd.exe /c "icacls.exe `"$Destination`" /grant Administrators:F" 2>&1 | ForEach-Object { Write-Host $_ }
+        cmd.exe /c "icacls.exe `"$Destination`" /grant `"$env:USERNAME`:(F)`"" 2>&1 | ForEach-Object { Write-Host $_ }
+        attrib.exe -r -s -h $Destination 2>&1 | Out-Null
+        Remove-Item -LiteralPath $Destination -Force
+    }
+
+    Copy-Item -LiteralPath $Source -Destination $Destination -Force
 }
 
 if (-not (Test-Administrator)) {
@@ -106,7 +133,7 @@ if (-not (Test-Path $FirmwareDir)) {
 
 Write-Host ''
 Write-Host 'Step 3/3: Staging patched ROM for flash on reboot...'
-Copy-Item -Path $patchedSource -Destination $FirmwareRom -Force
+Set-ProtectedFirmwareRom -Destination $FirmwareRom -Source $patchedSource
 $stagedSha = Get-Sha256Hex ([IO.File]::ReadAllBytes($FirmwareRom))
 if ($stagedSha -ne $PatchedSha) {
     throw "Staged ROM verification failed. SHA=$stagedSha"
@@ -121,9 +148,12 @@ if ($device) {
 }
 
 Write-Host ''
-Write-Host 'SUCCESS: Patched BIOS is staged.'
+Write-Host 'SUCCESS: Patched BIOS (v3 trustlet) is staged.'
 Write-Host 'A full restart is required. Windows will flash BIOS during reboot.'
 Write-Host 'Keep AC power connected. Do not interrupt the restart.'
+Write-Host ''
+Write-Host 'After reboot: run scripts\post_flash_tpm.ps1 (Clear TPM), reboot again,'
+Write-Host 'then rerun Call of Duty Secure Attestation Wizard.'
 Write-Host ''
 Write-Host 'Recovery: run Rollback_Stock.bat from this folder, then reboot.'
 Write-Host ''

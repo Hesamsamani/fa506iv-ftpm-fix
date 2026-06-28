@@ -6,11 +6,11 @@
 |---|---|
 | **Problem** | Warzone blocks FA506IV even with TPM 2.0 + Secure Boot enabled |
 | **Cause** | AMD fTPM `3.42.0.5` (`3.*.0.*` bad pattern) on BIOS **FA506IV.320** |
-| **Fix** | Patch version header **3.42.0.5 → 3.42.5.5** (experimental) |
+| **Fix (v1.1.0)** | Replace full fTPM trustlet → runtime class **3.42.2.5** (not `3.*.0.*`) |
 | **Download** | **[Releases (latest)](https://github.com/Hesamsamani/fa506iv-ftpm-fix/releases/latest)** |
 | **Website** | **[hesamsamani.github.io/fa506iv-ftpm-fix](https://hesamsamani.github.io/fa506iv-ftpm-fix/)** |
 
-Also known as: *ASUS TUF A15 TPM fix*, *FA506IV Warzone fix*, *FA506IV fTPM 3.42.5.5 patch*, *Ryzen 4800H Warzone TPM*.
+> **v1.0.0 withdrawn:** header-only patch did **not** change `tpm.msc` or pass attestation. Use **v1.1.0+** only.
 
 > **Disclaimer:** Experimental community project. Not affiliated with ASUS, AMD, or Activision. Flash at your own risk. Keep stock BIOS for recovery.
 
@@ -18,71 +18,51 @@ Also known as: *ASUS TUF A15 TPM fix*, *FA506IV Warzone fix*, *FA506IV fTPM 3.42
 
 ## Download
 
-| File | Best for |
-|------|----------|
-| [**FA506IV_fTPM_fix_EZFlash_v2.zip**](https://github.com/Hesamsamani/fa506iv-ftpm-fix/releases/latest) | **Safest** — USB + ASUS EZ Flash |
-| [**FA506IV_fTPM_fix_Windows.exe**](https://github.com/Hesamsamani/fa506iv-ftpm-fix/releases/latest) | Flash from Windows (still reboots) |
+| File | Use |
+|------|-----|
+| [**FA506IV_fTPM_fix_Windows.exe**](https://github.com/Hesamsamani/fa506iv-ftpm-fix/releases/latest) | **Apply patch** (recommended) |
+| `FA506IV_fTPM_fix_EZFlash_v2.zip` | **Rollback only** — EZ Flash rejects modified ROMs |
 
 ## Is this my laptop?
 
 - **Model:** ASUS TUF Gaming **A15 FA506IV**
 - **BIOS:** **FA506IV.320**
-- **CPU:** AMD Ryzen 7 **4800H** (or other Renoir 4000)
-- **Check TPM version:** `Win + R` → `tpm.msc` → Manufacturer Version **3.42.0.5**
+- **CPU:** AMD Ryzen 7 **4800H** (Renoir)
+- **Check:** `Win + R` → `tpm.msc` → Manufacturer Version **3.42.0.5**
 
-If all match and Warzone attestation fails → this project is for you.
+## Quick start — Windows installer (v1.1.0)
 
-## Quick start — EZ Flash (recommended)
+1. Download and extract **`FA506IV_fTPM_fix_Windows.exe`**
+2. **Right-click `Install.bat` → Run as administrator**
+3. Reboot when prompted (**AC power**, do not interrupt)
+4. Run **`post_flash_tpm.ps1`** as Administrator (clears TPM)
+5. Reboot again
+6. Re-run **Call of Duty Secure Attestation Wizard**
 
-1. Download **`FA506IV_fTPM_fix_EZFlash_v2.zip`** from [Releases](https://github.com/Hesamsamani/fa506iv-ftpm-fix/releases/latest)
-2. Extract to a **FAT32** USB drive
-3. Verify checksums in `SHA256.txt`
-4. Reboot → **F2** → **Advanced** → **ASUS EZ Flash 3**
-5. Select **`FA506IV.320`** (patched)
-6. Keep **`FA506IV.320.STOCK`** on USB for rollback
+Expected after success: `Get-Tpm` shows a version **other than 3.42.0.5** (e.g. **3.42.92.5** / `05025c03` class).
 
-## Quick start — Windows EXE
+## Rollback
 
-1. Download **`FA506IV_fTPM_fix_Windows.exe`**
-2. Run as **Administrator**
-3. Confirm **FA506IV** / BIOS **320**
-4. Reboot when prompted (**AC power** required)
-
-**EZ Flash is safer** for patched ROMs. See [docs/SAFETY.md](docs/SAFETY.md).
+- **Windows:** `Rollback_Stock.bat` as Administrator → reboot
+- **USB:** EZ Flash **`FA506IV.320.STOCK`** (FAT32 root)
 
 ## FAQ
 
-Common searches answered: **[docs/FAQ.md](docs/FAQ.md)**
-
-- Why Warzone blocks FA506IV with TPM enabled
-- Official ASUS fix availability
-- `tpm.msc` still showing 3.42.0.5 after flash
-- Rollback instructions
-
-## After flashing
-
-1. `tpmtool getdeviceinformation`
-2. [Activision Secure Attestation Wizard](https://support.activision.com/)
-3. Launch Warzone (accept `enrollaik.exe` UAC)
+[docs/FAQ.md](docs/FAQ.md) · [docs/SAFETY.md](docs/SAFETY.md) · [docs/TECHNICAL.md](docs/TECHNICAL.md)
 
 ## Build from source
 
-Place official ASUS `FA506IV.320` at `input/stock/` — see [input/README.md](input/README.md).
+Place official ASUS `FA506IV.320` at `input/stock/`.
 
 ```powershell
-python scripts/patch_ftpm_bios_v2.py
-python scripts/verify_patch_v2.py
+python scripts/patch_ftpm_bios_v3.py
 ```
 
-## Technical details
-
-[docs/TECHNICAL.md](docs/TECHNICAL.md) · [docs/SAFETY.md](docs/SAFETY.md)
-
-## Checksums
+## Checksums (v1.1.0)
 
 ```
-Stock:   DC7E5984FB4A39DE84204F54F6D8A95B04DFECDF3AA32D45D0AA904272AD3273
-Patched: 51CECB2BF48A58F224C55BB7210BABAED5B97DC72315BEA2CF1D0F26CD94759F
+Stock:      DC7E5984FB4A39DE84204F54F6D8A95B04DFECDF3AA32D45D0AA904272AD3273
+Patched v3: 37ED09073A01F2C6892603231BC9AB72164734ADD9D1D78A4D58E60E2049C316
 ```
 
 ## License

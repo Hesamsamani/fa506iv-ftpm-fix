@@ -35,9 +35,24 @@ Only **ASUS TUF Gaming A15 FA506IV** with BIOS **FA506IV.320** (Ryzen 7 4800H / 
 
 ASUS has not released a newer FA506IV BIOS after 320 with an official fTPM fix. Contact ASUS support citing **AMD PA-420** and request a firmware update.
 
-### EZ Flash or Windows EXE — which is safer?
+### EZ Flash says "not a proper BIOS driver" — why?
 
-**EZ Flash (USB) is safer** for this patched ROM. See [SAFETY.md](SAFETY.md).
+ASUS EZ Flash validates the BIOS image before flashing. This patch changes one byte inside the AMD PSP fTPM trustlet, so EZ Flash often **rejects the patched ROM** even though the file name and size are correct.
+
+**What to do:** use the **Windows installer** (`Install.bat` / `FA506IV_fTPM_fix_Windows.exe`) instead. It stages the patched ROM through the signed ASUS firmware driver path.
+
+**Sanity check:** copy only `FA506IV.320.STOCK` to a **FAT32** USB root and try EZ Flash. If stock flashes but patched does not, your USB setup is fine — the rejection is from the modification, not your procedure.
+
+### Windows installer fails with "Access denied" on `C:\Windows\Firmware\...`
+
+After `pnputil` installs the driver, Windows places `FA506IV.320` under `C:\Windows\Firmware\{1ddcfe17-12c6-5c0a-81a0-dd30045ce6aa}\` with **TrustedInstaller** ownership. Older installer builds used `Copy-Item`, which fails even as Administrator.
+
+**Fix:** use installer **v1.0.1+** (or the updated `BIOSInstall_FTPMFix.ps1` in Downloads) — it runs `takeown` + `icacls` before replacing the staged ROM.
+
+### EZ Flash or Windows EXE — which should I use for this patch?
+
+- **Stock ASUS BIOS:** EZ Flash is fine.
+- **This patched ROM:** use the **Windows installer** (EZ Flash usually blocks modified images).
 
 ## After patching
 

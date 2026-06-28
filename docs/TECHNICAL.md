@@ -10,30 +10,33 @@ AMD fTPM versions matching `3.*.0.*` (e.g. **3.42.0.5**) fail attestation checks
 - **BIOS base:** **FA506IV.320** (June 2022)
 - **CPU:** AMD Ryzen 4000 (Renoir) with AMD fTPM
 
-## Patch
+## Patch (v1.1.0 — trustlet replacement)
 
-Single-byte change in PSP boot-time trustlet version header:
+Replaces the full PSP boot-time trustlet region:
 
 | Field | Value |
 |-------|-------|
 | Trustlet region | `0x393200` (131328 bytes) |
 | Version offset | `0x393260` |
-| Change | `05 00 2a 03` → `05 05 2a 03` |
-| Byte index | `0x393261`: `0x00` → `0x05` |
+| Stock version | `05 00 2a 03` (3.42.0.5 — PA-420 bad) |
+| Patched version | `05 02 5c 03` (3.42.2.5 class — not `3.*.0.*`) |
+
+v1.0.0 header-only patch (`05 05 2a 03`) is **withdrawn** — it did not change runtime TPM version.
 
 ## Checksums
 
 ```
-Stock:   DC7E5984FB4A39DE84204F54F6D8A95B04DFECDF3AA32D45D0AA904272AD3273
-Patched: 51CECB2BF48A58F224C55BB7210BABAED5B97DC72315BEA2CF1D0F26CD94759F
+Stock:      DC7E5984FB4A39DE84204F54F6D8A95B04DFECDF3AA32D45D0AA904272AD3273
+Patched v3: 37ED09073A01F2C6892603231BC9AB72164734ADD9D1D78A4D58E60E2049C316
 ```
 
 ## Limitations
 
-- Header-only patch; does not replace AMD's signed fTPM firmware binary
-- PSP trustlet signature is not re-signed by ASUS/AMD
-- `tpm.msc` may still show **3.42.0.5** after flash
-- Use Activision Secure Attestation Wizard and `tpmtool getdeviceinformation` to verify
+- Experimental trustlet swap from a Renoir-compatible source BIOS
+- Not re-signed by ASUS/AMD
+- EZ Flash rejects modified ROMs — use Windows installer
+- Clear TPM after flash (`scripts/post_flash_tpm.ps1`)
+- Verify with Activision Secure Attestation Wizard
 
 ## Windows installer internals
 
