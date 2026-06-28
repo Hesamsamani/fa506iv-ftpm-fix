@@ -1,0 +1,8 @@
+title: ASUS FA506IV fTPM Fix for Warzone
+description: Fix TPM 2.0 attestation on ASUS TUF A15 FA506IV for Call of Duty Warzone. AMD PA-420 fTPM 3.42.0.5 patch.
+url: "https://hesamsamani.github.io"
+baseurl: "/fa506iv-ftpm-fix"
+theme: jekyll-theme-cayman
+show_downloads: true
+github:
+  repository_url: https://github.com/Hesamsamani/fa506iv-ftpm-fix

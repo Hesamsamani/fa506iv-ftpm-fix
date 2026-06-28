@@ -1,89 +1,82 @@
-# ASUS FA506IV fTPM Fix (Experimental)
+# ASUS FA506IV fTPM Fix — Warzone TPM 2.0 Attestation (FA506IV BIOS 320)
 
-Community patch for **ASUS TUF A15 FA506IV** BIOS **320** to address AMD fTPM version **3.42.0.5** (`3.*.0.*`) attestation issues affecting Call of Duty / Warzone (AMD PA-420).
+**Fix Call of Duty / Warzone TPM attestation on ASUS TUF Gaming A15 FA506IV** when fTPM version **3.42.0.5** fails AMD **PA-420** checks.
 
-Patches the PSP trustlet **version header** from **3.42.0.5** → **3.42.5.5** (single-byte change). See [docs/TECHNICAL.md](docs/TECHNICAL.md).
+| | |
+|---|---|
+| **Problem** | Warzone blocks FA506IV even with TPM 2.0 + Secure Boot enabled |
+| **Cause** | AMD fTPM `3.42.0.5` (`3.*.0.*` bad pattern) on BIOS **FA506IV.320** |
+| **Fix** | Patch version header **3.42.0.5 → 3.42.5.5** (experimental) |
+| **Download** | **[Releases (latest)](https://github.com/Hesamsamani/fa506iv-ftpm-fix/releases/latest)** |
+| **Website** | **[hesamsamani.github.io/fa506iv-ftpm-fix](https://hesamsamani.github.io/fa506iv-ftpm-fix/)** |
 
-> **Disclaimer:** Experimental. Flash at your own risk. May not fully fix attestation. Keep stock BIOS for recovery. Not affiliated with ASUS or AMD.
+Also known as: *ASUS TUF A15 TPM fix*, *FA506IV Warzone fix*, *FA506IV fTPM 3.42.5.5 patch*, *Ryzen 4800H Warzone TPM*.
 
-## Which method is safer?
+> **Disclaimer:** Experimental community project. Not affiliated with ASUS, AMD, or Activision. Flash at your own risk. Keep stock BIOS for recovery.
 
-**EZ Flash (USB) is safer** for this patched ROM — simpler, more direct, fewer failure modes.
+---
 
-| Method | Safety | Convenience |
-|--------|--------|-------------|
-| **EZ Flash (recommended)** | Safer for modded ROM | Needs USB + BIOS menu |
-| **Windows EXE** | Extra steps (driver swap) | No BIOS menu; still requires reboot |
+## Download
 
-Full comparison: [docs/SAFETY.md](docs/SAFETY.md)
+| File | Best for |
+|------|----------|
+| [**FA506IV_fTPM_fix_EZFlash_v2.zip**](https://github.com/Hesamsamani/fa506iv-ftpm-fix/releases/latest) | **Safest** — USB + ASUS EZ Flash |
+| [**FA506IV_fTPM_fix_Windows.exe**](https://github.com/Hesamsamani/fa506iv-ftpm-fix/releases/latest) | Flash from Windows (still reboots) |
 
-## Quick start (releases)
+## Is this my laptop?
 
-Download from [Releases](https://github.com/Hesamsamani/fa506iv-ftpm-fix/releases):
+- **Model:** ASUS TUF Gaming **A15 FA506IV**
+- **BIOS:** **FA506IV.320**
+- **CPU:** AMD Ryzen 7 **4800H** (or other Renoir 4000)
+- **Check TPM version:** `Win + R` → `tpm.msc` → Manufacturer Version **3.42.0.5**
 
-| File | Use |
-|------|-----|
-| `FA506IV_fTPM_fix_EZFlash_v2.zip` | **Safest** — extract to FAT32 USB, flash via EZ Flash |
-| `FA506IV_fTPM_fix_Windows.exe` | Flash from Windows (reboot required) |
+If all match and Warzone attestation fails → this project is for you.
 
-### EZ Flash steps
+## Quick start — EZ Flash (recommended)
 
-1. Extract zip to FAT32 USB
-2. Verify checksums in `SHA256.txt`
-3. BIOS → F2 → Advanced → **ASUS EZ Flash 3**
-4. Flash **`FA506IV.320`** (patched)
-5. Keep **`FA506IV.320.STOCK`** on USB for rollback
+1. Download **`FA506IV_fTPM_fix_EZFlash_v2.zip`** from [Releases](https://github.com/Hesamsamani/fa506iv-ftpm-fix/releases/latest)
+2. Extract to a **FAT32** USB drive
+3. Verify checksums in `SHA256.txt`
+4. Reboot → **F2** → **Advanced** → **ASUS EZ Flash 3**
+5. Select **`FA506IV.320`** (patched)
+6. Keep **`FA506IV.320.STOCK`** on USB for rollback
 
-### Windows EXE steps
+## Quick start — Windows EXE
 
-1. Run **`FA506IV_fTPM_fix_Windows.exe`** as Administrator
-2. Confirm model **FA506IV** / BIOS **320**
-3. Reboot when prompted (AC power connected)
+1. Download **`FA506IV_fTPM_fix_Windows.exe`**
+2. Run as **Administrator**
+3. Confirm **FA506IV** / BIOS **320**
+4. Reboot when prompted (**AC power** required)
 
-## Build from source
+**EZ Flash is safer** for patched ROMs. See [docs/SAFETY.md](docs/SAFETY.md).
 
-### 1. Get official ASUS ROM
+## FAQ
 
-See [input/README.md](input/README.md). Place stock `FA506IV.320` at `input/stock/FA506IV.320`.
+Common searches answered: **[docs/FAQ.md](docs/FAQ.md)**
 
-### 2. Patch
-
-```powershell
-python scripts/patch_ftpm_bios_v2.py
-```
-
-Outputs:
-
-- `output/FA506IV.320` — patched ROM
-- `output/ezflash_package/` — EZ Flash package
-
-### 3. Verify
-
-```powershell
-python scripts/verify_patch_v2.py
-```
-
-### 4. Build Windows EXE (optional)
-
-Requires 7-Zip and ASUS `.cat`/`.inf` in `input/asus-extract/Cabfile/`:
-
-```powershell
-.\scripts\prepare_windows_package.ps1
-.\windows-installer\build_windows_installer.ps1
-```
+- Why Warzone blocks FA506IV with TPM enabled
+- Official ASUS fix availability
+- `tpm.msc` still showing 3.42.0.5 after flash
+- Rollback instructions
 
 ## After flashing
 
 1. `tpmtool getdeviceinformation`
 2. [Activision Secure Attestation Wizard](https://support.activision.com/)
-3. Test Warzone (accept `enrollaik.exe` UAC prompt)
+3. Launch Warzone (accept `enrollaik.exe` UAC)
 
-`tpm.msc` may still show **3.42.0.5** — that alone does not mean the patch failed.
+## Build from source
 
-## Recovery
+Place official ASUS `FA506IV.320` at `input/stock/` — see [input/README.md](input/README.md).
 
-- **EZ Flash:** flash `FA506IV.320.STOCK` from USB
-- **Windows:** run `Rollback_Stock.bat` from the Windows package
+```powershell
+python scripts/patch_ftpm_bios_v2.py
+python scripts/verify_patch_v2.py
+```
+
+## Technical details
+
+[docs/TECHNICAL.md](docs/TECHNICAL.md) · [docs/SAFETY.md](docs/SAFETY.md)
 
 ## Checksums
 
@@ -94,4 +87,4 @@ Patched: 51CECB2BF48A58F224C55BB7210BABAED5B97DC72315BEA2CF1D0F26CD94759F
 
 ## License
 
-MIT — see [LICENSE](LICENSE). ASUS BIOS binaries are **not** redistributed; obtain them from ASUS support.
+MIT — [LICENSE](LICENSE). ASUS BIOS binaries are **not** redistributed.
