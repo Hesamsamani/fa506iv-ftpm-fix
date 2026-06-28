@@ -1,0 +1,30 @@
+# User-supplied ASUS files (download from ASUS support)
+input/stock/FA506IV.320
+input/asus-extract/
+input/*.exe
+input/*.zip
+
+# Generated outputs
+output/
+releases/*.exe
+releases/*.zip
+releases/*.7z
+
+# Windows installer build artifacts
+windows-installer/FA506IV.320.PATCHED
+windows-installer/FA506IV.320.STOCK
+windows-installer/Cabfile_FA506IV*
+windows-installer/Cabfile/
+windows-installer/*.7z
+windows-installer/config.txt
+
+# Python
+__pycache__/
+*.pyc
+
+# OS / editor
+.DS_Store
+Thumbs.db
+.vscode/
+.idea/
+*.log
