@@ -22,6 +22,14 @@ windows-installer/config.txt
 __pycache__/
 *.pyc
 
+# GUI build artifacts
+gui-payload.zip
+tools/CODSecureAttestationWizard.exe
+tools/Smokeless_UMAF/
+gui/**/bin/
+gui/**/obj/
+gui/publish/
+
 # OS / editor
 .DS_Store
 Thumbs.db

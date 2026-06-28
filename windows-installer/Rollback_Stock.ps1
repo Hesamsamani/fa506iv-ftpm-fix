@@ -1,4 +1,8 @@
 #Requires -RunAsAdministrator
+param(
+    [switch]$NonInteractive,
+    [switch]$SkipReboot
+)
 $ErrorActionPreference = 'Stop'
 
 $FirmwareGuid = '{1ddcfe17-12c6-5c0a-81a0-dd30045ce6aa}'
@@ -52,7 +56,11 @@ cmd.exe /c "pnputil.exe /add-driver `"$($infFile.FullName)`" /install" | Write-H
 
 Set-ProtectedFirmwareRom -Destination $FirmwareRom -Source $StockSource
 Write-Host 'Stock ROM staged. Reboot to restore original BIOS.'
-$answer = Read-Host 'Reboot now? (Y/N)'
-if ($answer -match '^[Yy]') {
-    shutdown.exe /r /t 15 /c 'Restoring stock ASUS FA506IV.320 BIOS on restart.'
+if ($NonInteractive -and -not $SkipReboot) {
+    shutdown.exe /r /fw /t 60 /c 'Restoring stock ASUS FA506IV.320 BIOS on restart.'
+} elseif (-not $NonInteractive) {
+    $answer = Read-Host 'Reboot now? (Y/N)'
+    if ($answer -match '^[Yy]') {
+        shutdown.exe /r /fw /t 15 /c 'Restoring stock ASUS FA506IV.320 BIOS on restart.'
+    }
 }

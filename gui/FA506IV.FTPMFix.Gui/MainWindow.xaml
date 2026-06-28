@@ -1,0 +1,209 @@
+<Window x:Class="FA506IV.FTPMFix.Gui.MainWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        Title="ASUS FA506IV fTPM Fix — Warzone TPM"
+        Icon="Assets/app.ico"
+        Height="900" Width="1120"
+        MinHeight="760" MinWidth="960"
+        WindowStartupLocation="CenterScreen">
+    <Grid Margin="20">
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="*"/>
+            <RowDefinition Height="200"/>
+            <RowDefinition Height="Auto"/>
+        </Grid.RowDefinitions>
+
+        <!-- Hero banner -->
+        <Border Grid.Row="0" CornerRadius="14" ClipToBounds="True" Margin="0,0,0,14" Height="150">
+            <Grid>
+                <Image Source="Assets/hero-banner.jpg" Stretch="UniformToFill" />
+                <Border Background="{StaticResource HeroOverlayBrush}" />
+                <DockPanel Margin="20,16">
+                    <StackPanel DockPanel.Dock="Right" Orientation="Horizontal" VerticalAlignment="Top">
+                        <Border Background="#CC1A212B" BorderBrush="{StaticResource AccentBrush}" BorderThickness="1" CornerRadius="16" Padding="12,6" Margin="0,0,10,0">
+                            <TextBlock x:Name="AdminBadge" Text="Checking admin..." Foreground="{StaticResource MutedBrush}" FontSize="12"/>
+                        </Border>
+                        <Button x:Name="RefreshButton" Content="Refresh" Style="{StaticResource SecondaryButton}" Click="RefreshButton_Click" Padding="12,8"/>
+                    </StackPanel>
+                    <StackPanel VerticalAlignment="Center">
+                        <StackPanel Orientation="Horizontal">
+                            <TextBlock Text="ASUS FA506IV" FontSize="28" FontWeight="Bold" Foreground="{StaticResource AccentBrush}"/>
+                            <TextBlock Text=" fTPM Fix" FontSize="28" FontWeight="Bold" Foreground="{StaticResource TextBrush}"/>
+                        </StackPanel>
+                        <TextBlock Text="TUF A15 BIOS 320 · Warzone / Call of Duty TPM attestation repair" Style="{StaticResource LabelText}" Margin="0,6,0,0" Foreground="#C8D0DC"/>
+                        <StackPanel Orientation="Horizontal" Margin="0,8,0,0">
+                            <Border Background="{StaticResource AccentSoftBrush}" BorderBrush="{StaticResource AccentBrush}" BorderThickness="1" CornerRadius="6" Padding="8,3" Margin="0,0,8,0">
+                                <TextBlock Text="v1.3.0" FontSize="11" FontWeight="SemiBold" Foreground="{StaticResource AccentBrush}"/>
+                            </Border>
+                            <Border Background="#1A2E22" BorderBrush="{StaticResource TpmGreenBrush}" BorderThickness="1" CornerRadius="6" Padding="8,3">
+                                <TextBlock Text="TPM 3.42.0.5 → fixed trustlet" FontSize="11" Foreground="{StaticResource TpmGreenBrush}"/>
+                            </Border>
+                        </StackPanel>
+                    </StackPanel>
+                </DockPanel>
+            </Grid>
+        </Border>
+
+        <!-- Status cards -->
+        <UniformGrid Grid.Row="1" Columns="4" Margin="0,0,0,14">
+            <Border Style="{StaticResource CardBorder}" Margin="0,0,8,0">
+                <StackPanel>
+                    <TextBlock Text="LAPTOP" Style="{StaticResource LabelText}"/>
+                    <TextBlock x:Name="ModelValue" Text="—" Style="{StaticResource ValueText}" TextWrapping="Wrap" Margin="0,6,0,0"/>
+                    <TextBlock x:Name="BiosValue" Text="BIOS —" Style="{StaticResource LabelText}" Margin="0,4,0,0"/>
+                </StackPanel>
+            </Border>
+            <Border Style="{StaticResource CardBorder}" Margin="4,0">
+                <StackPanel>
+                    <TextBlock Text="TPM VERSION" Style="{StaticResource LabelText}"/>
+                    <TextBlock x:Name="TpmVersionValue" Text="—" FontSize="18" FontWeight="Bold" Margin="0,6,0,0"/>
+                    <TextBlock x:Name="TpmSubValue" Text="" Style="{StaticResource LabelText}" Margin="0,4,0,0"/>
+                </StackPanel>
+            </Border>
+            <Border Style="{StaticResource CardBorder}" Margin="4,0">
+                <StackPanel>
+                    <TextBlock Text="FLASH STATUS" Style="{StaticResource LabelText}"/>
+                    <TextBlock x:Name="FlashValue" Text="—" Style="{StaticResource ValueText}" Margin="0,6,0,0"/>
+                    <TextBlock x:Name="FlashSubValue" Text="" Style="{StaticResource LabelText}" Margin="0,4,0,0"/>
+                </StackPanel>
+            </Border>
+            <Border Style="{StaticResource CardBorder}" Margin="8,0,0,0" Background="{StaticResource AccentSoftBrush}">
+                <StackPanel>
+                    <TextBlock Text="COD ATTESTATION" Style="{StaticResource LabelText}"/>
+                    <TextBlock x:Name="AttestationValue" Text="—" FontSize="16" FontWeight="Bold" Margin="0,6,0,0"/>
+                    <TextBlock x:Name="AttestationSubValue" Text="Wizard v1.0.5" Style="{StaticResource LabelText}" Margin="0,4,0,0"/>
+                </StackPanel>
+            </Border>
+        </UniformGrid>
+
+        <!-- Workflow -->
+        <ScrollViewer Grid.Row="3" VerticalScrollBarVisibility="Auto">
+            <StackPanel>
+                <TextBlock Text="Guided workflow" FontSize="16" FontWeight="SemiBold" Margin="0,0,0,12"/>
+
+                <Border Style="{StaticResource CardBorder}" Margin="0,0,0,10" BorderBrush="{StaticResource WarnBrush}">
+                    <Grid>
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="36"/>
+                            <ColumnDefinition Width="*"/>
+                            <ColumnDefinition Width="Auto"/>
+                        </Grid.ColumnDefinitions>
+                        <TextBlock Text="!" FontSize="18" FontWeight="Bold" Foreground="{StaticResource WarnBrush}" VerticalAlignment="Center"/>
+                        <StackPanel Grid.Column="1" Margin="12,0">
+                            <TextBlock Text="If /fw reboot already failed" Style="{StaticResource StepTitle}"/>
+                            <TextBlock Text="Clears Phase 2 / 0xC0000001 failed Windows flash and restores stock ROM staging." Style="{StaticResource LabelText}" TextWrapping="Wrap" Margin="0,4,0,0"/>
+                        </StackPanel>
+                        <Button Grid.Column="2" x:Name="CleanupButton" Content="Cleanup failed flash" Style="{StaticResource SecondaryButton}" Click="CleanupButton_Click"/>
+                    </Grid>
+                </Border>
+
+                <Border Style="{StaticResource CardBorder}" Margin="0,0,0,10">
+                    <Grid>
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="36"/>
+                            <ColumnDefinition Width="*"/>
+                            <ColumnDefinition Width="Auto"/>
+                        </Grid.ColumnDefinitions>
+                        <TextBlock Text="1" FontSize="18" FontWeight="Bold" Foreground="{StaticResource AccentBrush}" VerticalAlignment="Center"/>
+                        <StackPanel Grid.Column="1" Margin="12,0">
+                            <TextBlock Text="Prepare EZ Flash USB (recommended)" Style="{StaticResource StepTitle}"/>
+                            <TextBlock Text="Copies patched FA506IV.320 + stock rollback to a FAT32 USB. Flash from BIOS (F2 → EZ Flash 3)." Style="{StaticResource LabelText}" TextWrapping="Wrap" Margin="0,4,0,0"/>
+                        </StackPanel>
+                        <Button Grid.Column="2" x:Name="EzFlashButton" Content="Prepare EZ Flash USB" Style="{StaticResource PrimaryButton}" Click="EzFlashButton_Click"/>
+                    </Grid>
+                </Border>
+
+                <Border Style="{StaticResource CardBorder}" Margin="0,0,0,10">
+                    <Grid>
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="36"/>
+                            <ColumnDefinition Width="*"/>
+                            <ColumnDefinition Width="Auto"/>
+                        </Grid.ColumnDefinitions>
+                        <TextBlock Text="2" FontSize="18" FontWeight="Bold" Foreground="{StaticResource AccentBrush}" VerticalAlignment="Center"/>
+                        <StackPanel Grid.Column="1" Margin="12,0">
+                            <TextBlock Text="Verify flash + Clear TPM" Style="{StaticResource StepTitle}"/>
+                            <TextBlock Text="After EZ Flash, confirm TPM version changed (not 3.42.0.5), then clear TPM." Style="{StaticResource LabelText}" TextWrapping="Wrap" Margin="0,4,0,0"/>
+                        </StackPanel>
+                        <StackPanel Grid.Column="2" Orientation="Horizontal">
+                            <Button x:Name="VerifyButton" Content="Verify flash" Style="{StaticResource SecondaryButton}" Margin="0,0,8,0" Click="VerifyButton_Click"/>
+                            <Button x:Name="ClearTpmButton" Content="Clear TPM" Style="{StaticResource PrimaryButton}" Click="ClearTpmButton_Click"/>
+                        </StackPanel>
+                    </Grid>
+                </Border>
+
+                <Border Style="{StaticResource CardBorder}" Margin="0,0,0,10" Opacity="0.75">
+                    <Grid>
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="36"/>
+                            <ColumnDefinition Width="*"/>
+                            <ColumnDefinition Width="Auto"/>
+                        </Grid.ColumnDefinitions>
+                        <TextBlock Text="—" FontSize="18" FontWeight="Bold" Foreground="{StaticResource MutedBrush}" VerticalAlignment="Center"/>
+                        <StackPanel Grid.Column="1" Margin="12,0">
+                            <TextBlock Text="Legacy Windows staging (does not flash hardware)" Style="{StaticResource StepTitle}"/>
+                            <TextBlock Text="Windows /fw cannot apply patched ROMs — catalog only signs stock. Staging is diagnostic only." Style="{StaticResource LabelText}" TextWrapping="Wrap" Margin="0,4,0,0"/>
+                        </StackPanel>
+                        <StackPanel Grid.Column="2" Orientation="Horizontal">
+                            <Button x:Name="InstallButton" Content="Stage patch" Style="{StaticResource SecondaryButton}" Margin="0,0,8,0" Click="InstallButton_Click"/>
+                            <Button x:Name="RepairButton" Content="Repair staging" Style="{StaticResource SecondaryButton}" Margin="0,0,8,0" Click="RepairButton_Click"/>
+                            <Button x:Name="FwRebootButton" Content="/fw (blocked)" Style="{StaticResource SecondaryButton}" Click="FwRebootButton_Click"/>
+                        </StackPanel>
+                    </Grid>
+                </Border>
+
+                <Border Style="{StaticResource CardBorder}" Margin="0,0,0,10" BorderBrush="{StaticResource AccentBrush}">
+                    <Grid>
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="36"/>
+                            <ColumnDefinition Width="*"/>
+                            <ColumnDefinition Width="Auto"/>
+                        </Grid.ColumnDefinitions>
+                        <TextBlock Text="3" FontSize="18" FontWeight="Bold" Foreground="{StaticResource AccentBrush}" VerticalAlignment="Center"/>
+                        <StackPanel Grid.Column="1" Margin="12,0">
+                            <TextBlock Text="Call of Duty Secure Attestation Wizard v1.0.5" Style="{StaticResource StepTitle}"/>
+                            <TextBlock Text="Run Activision's official wizard or use built-in pre-check (TPM, Secure Boot, PA-420 pattern)." Style="{StaticResource LabelText}" TextWrapping="Wrap" Margin="0,4,0,0"/>
+                            <TextBlock x:Name="AttestationDetailText" Text="" Style="{StaticResource LabelText}" TextWrapping="Wrap" Margin="0,8,0,0" Foreground="{StaticResource WarnBrush}"/>
+                        </StackPanel>
+                        <StackPanel Grid.Column="2" Orientation="Horizontal">
+                            <Button x:Name="AttestationCheckButton" Content="Pre-check" Style="{StaticResource SecondaryButton}" Margin="0,0,8,0" Click="AttestationCheckButton_Click"/>
+                            <Button x:Name="LaunchWizardButton" Content="Open COD Wizard" Style="{StaticResource PrimaryButton}" Click="LaunchWizardButton_Click"/>
+                        </StackPanel>
+                    </Grid>
+                </Border>
+
+                <Border Style="{StaticResource CardBorder}">
+                    <DockPanel>
+                        <Button DockPanel.Dock="Right" x:Name="RollbackButton" Content="Rollback stock BIOS" Style="{StaticResource DangerButton}" Click="RollbackButton_Click"/>
+                        <StackPanel>
+                            <TextBlock Text="Recovery" Style="{StaticResource StepTitle}"/>
+                            <TextBlock Text="Restores signed stock FA506IV.320 and schedules firmware reboot." Style="{StaticResource LabelText}" Margin="0,4,0,0"/>
+                        </StackPanel>
+                    </DockPanel>
+                </Border>
+            </StackPanel>
+        </ScrollViewer>
+
+        <!-- Log -->
+        <Border Grid.Row="4" Style="{StaticResource CardBorder}" Margin="0,14,0,10">
+            <DockPanel>
+                <TextBlock DockPanel.Dock="Top" Text="Activity log" Style="{StaticResource LabelText}" Margin="0,0,0,8"/>
+                <TextBox x:Name="LogBox"
+                         IsReadOnly="True"
+                         TextWrapping="Wrap"
+                         VerticalScrollBarVisibility="Auto"
+                         Background="#0A0D11"
+                         Foreground="#C7D2E0"
+                         BorderThickness="0"
+                         FontFamily="Consolas"
+                         FontSize="12"/>
+            </DockPanel>
+        </Border>
+
+        <TextBlock Grid.Row="5" Text="Experimental community tool — not affiliated with ASUS, AMD, or Activision. Keep AC power connected during BIOS flash."
+                   Style="{StaticResource LabelText}" TextWrapping="Wrap"/>
+    </Grid>
+</Window>

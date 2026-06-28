@@ -38,8 +38,15 @@ Patched v3: 37ED09073A01F2C6892603231BC9AB72164734ADD9D1D78A4D58E60E2049C316
 - Clear TPM after flash (`scripts/post_flash_tpm.ps1`)
 - Verify with Activision Secure Attestation Wizard
 
-## Windows installer internals
+## Windows installer internals (v1.2)
 
-1. `pnputil` installs the **stock** signed ASUS firmware driver (catalog matches stock ROM)
-2. Patched ROM overwrites `C:\Windows\Firmware\{1ddcfe17-12c6-5c0a-81a0-dd30045ce6aa}\FA506IV.320`
-3. Reboot triggers Windows firmware update with the staged patched file
+1. `pnputil` installs the **stock** signed ASUS firmware driver (catalog matches stock ROM in the cab)
+2. Patched ROM overwrites **both**:
+   - `C:\Windows\Firmware\{1ddcfe17-12c6-5c0a-81a0-dd30045ce6aa}\FA506IV.320`
+   - `C:\Windows\System32\DriverStore\FileRepository\fa506iv_320.inf_amd64_*\FA506IV.320`
+3. Registry marks offered firmware version **0x321** (installed ESRT is **0x320**)
+4. Reboot triggers Windows firmware update with the staged patched file
+
+### v1.1 bug (fixed in v1.2)
+
+v1.1 only swapped the Firmware-folder ROM. DriverStore kept the **stock** image and offered version stayed **0x320**, so Windows **skipped the SPI flash**. Symptom: `Get-Tpm` still shows **3.42.0.5** after reboot + `post_flash_tpm.ps1`.

@@ -21,9 +21,9 @@ This project patches the BIOS fTPM **version header** from 3.42.0.5 → 3.42.5.5
 **Official release (recommended):**  
 https://github.com/Hesamsamani/fa506iv-ftpm-fix/releases/latest
 
-Files:
-- `FA506IV_fTPM_fix_EZFlash_v2.zip` — safest (USB + EZ Flash)
-- `FA506IV_fTPM_fix_Windows.exe` — flash from Windows
+Files (v1.3.1):
+- `FA506IV_fTPM_Fix_GUI.exe` — recommended guided installer
+- `FA506IV_fTPM_fix_EZFlash_v3.zip` — USB + ASUS EZ Flash 3
 
 ## Hardware / BIOS
 
@@ -39,7 +39,7 @@ ASUS has not released a newer FA506IV BIOS after 320 with an official fTPM fix. 
 
 ASUS EZ Flash validates the BIOS image before flashing. This patch changes one byte inside the AMD PSP fTPM trustlet, so EZ Flash often **rejects the patched ROM** even though the file name and size are correct.
 
-**What to do:** use the **Windows installer** (`Install.bat` / `FA506IV_fTPM_fix_Windows.exe`) instead. It stages the patched ROM through the signed ASUS firmware driver path.
+**What to do:** use **`FA506IV_fTPM_Fix_GUI.exe`** → **Prepare EZ Flash USB**, then flash from BIOS. If EZ Flash still rejects the file, run **COD attestation pre-check** — your system may already pass without a BIOS flash.
 
 **Sanity check:** copy only `FA506IV.320.STOCK` to a **FAT32** USB root and try EZ Flash. If stock flashes but patched does not, your USB setup is fine — the rejection is from the modification, not your procedure.
 
@@ -49,12 +49,17 @@ After `pnputil` installs the driver, Windows places `FA506IV.320` under `C:\Wind
 
 **Fix:** use installer **v1.0.1+** (or the updated `BIOSInstall_FTPMFix.ps1` in Downloads) — it runs `takeown` + `icacls` before replacing the staged ROM.
 
-### EZ Flash or Windows EXE — which should I use for this patch?
+### EZ Flash or Windows — which should I use?
 
 - **Stock ASUS BIOS:** EZ Flash is fine.
-- **This patched ROM:** use the **Windows installer** (EZ Flash usually blocks modified images).
+- **This patched ROM (v1.3):** **EZ Flash USB** via the GUI or `FA506IV_fTPM_fix_EZFlash_v3.zip`.
+- **Do not use Windows `/fw` reboot** — it fails with `0xC0000001` because the catalog only signs stock ROM.
 
 ## After patching
+
+### I ran the installer and post_flash_tpm.ps1 but TPM is still 3.42.0.5
+
+If you used **v1.1** or early Windows installer builds, Windows likely **never flashed** the patched ROM (only staged it on disk). Run **`scripts\Repair.bat`** or **`scripts\Repair_FirmwareFlash.ps1`** as Administrator (v1.2), reboot fully (turn off Fast Startup), then `scripts\verify_flash_status.ps1` and `scripts\post_flash_tpm.ps1`.
 
 ### tpm.msc still shows 3.42.0.5 after flash. Did it fail?
 
