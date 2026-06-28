@@ -6,7 +6,7 @@ namespace FA506IV.FTPMFix.Gui.Services;
 
 public sealed class PayloadManager
 {
-    public const string PayloadVersion = "1.3.2";
+    public const string PayloadVersion = "1.3.3";
 
     private static PayloadManager? _instance;
     private string? _root;

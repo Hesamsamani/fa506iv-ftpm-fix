@@ -8,7 +8,7 @@
 
     <AssemblyName>FA506IV_fTPM_Fix</AssemblyName>
     <RootNamespace>FA506IV.FTPMFix.Gui</RootNamespace>
-    <Version>1.3.2</Version>
+    <Version>1.3.3</Version>
     <Company>Hesamsamani</Company>
     <Product>ASUS FA506IV fTPM Fix</Product>
     <Description>GUI installer for FA506IV Warzone TPM attestation fix</Description>

@@ -2,7 +2,7 @@ using System.Diagnostics;
 using System.IO;
 using System.Text.Json;
 using System.Windows;
-using System.Windows.Media;
+using System.Windows.Documents;
 using FA506IV.FTPMFix.Gui.Services;
 
 namespace FA506IV.FTPMFix.Gui;
@@ -24,7 +24,7 @@ public partial class MainWindow : Window
         if (!AdminHelper.IsAdministrator())
         {
             AdminBadge.Text = "Not admin";
-            AdminBadge.Foreground = (Brush)FindResource("WarnBrush");
+            SetBrushResource(AdminBadge, TextElement.ForegroundProperty, "WarnBrush");
             if (AdminHelper.TryRelaunchAsAdministrator())
             {
                 return;
@@ -34,7 +34,7 @@ public partial class MainWindow : Window
         }
 
         AdminBadge.Text = "Administrator";
-        AdminBadge.Foreground = (Brush)FindResource("OkBrush");
+        SetBrushResource(AdminBadge, TextElement.ForegroundProperty, "OkBrush");
         Log("Payload: " + _payload.Root);
         await RefreshStatusAsync();
     }
@@ -199,9 +199,10 @@ public partial class MainWindow : Window
         {
             var version = ver.GetString() ?? "—";
             TpmVersionValue.Text = version;
-            TpmVersionValue.Foreground = version == "3.42.0.5"
-                ? (Brush)FindResource("ErrBrush")
-                : (Brush)FindResource("OkBrush");
+            SetBrushResource(
+                TpmVersionValue,
+                TextElement.ForegroundProperty,
+                version == "3.42.0.5" ? "ErrBrush" : "OkBrush");
             var pending = tpm.TryGetProperty("RestartPending", out var rp) && rp.GetBoolean();
             TpmSubValue.Text = pending ? "Restart pending" : (tpm.TryGetProperty("ManufacturerId", out var mid) ? mid.GetString() : "");
         }
@@ -217,7 +218,7 @@ public partial class MainWindow : Window
             if (!tpmBad)
             {
                 FlashValue.Text = "BIOS patched";
-                FlashValue.Foreground = (Brush)FindResource("OkBrush");
+                SetBrushResource(FlashValue, TextElement.ForegroundProperty, "OkBrush");
                 FlashSubValue.Text = tpmEl.TryGetProperty("ManufacturerVersion", out var tv)
                     ? "TPM " + tv.GetString()
                     : "";
@@ -225,13 +226,13 @@ public partial class MainWindow : Window
             else if (windowsFailed || needsCleanup)
             {
                 FlashValue.Text = "/fw flash failed";
-                FlashValue.Foreground = (Brush)FindResource("ErrBrush");
+                SetBrushResource(FlashValue, TextElement.ForegroundProperty, "ErrBrush");
                 FlashSubValue.Text = "Click Cleanup, then Prepare EZ Flash USB";
             }
             else
             {
                 FlashValue.Text = "Use EZ Flash USB";
-                FlashValue.Foreground = (Brush)FindResource("WarnBrush");
+                SetBrushResource(FlashValue, TextElement.ForegroundProperty, "WarnBrush");
                 FlashSubValue.Text = "Windows /fw cannot apply patched ROM";
             }
         }
@@ -258,14 +259,16 @@ public partial class MainWindow : Window
             var summary = root.GetProperty("Summary").GetString() ?? "";
 
             AttestationValue.Text = pass ? "Likely PASS" : "Likely FAIL";
-            AttestationValue.Foreground = pass
-                ? (Brush)FindResource("OkBrush")
-                : (Brush)FindResource("ErrBrush");
+            SetBrushResource(
+                AttestationValue,
+                TextElement.ForegroundProperty,
+                pass ? "OkBrush" : "ErrBrush");
 
             AttestationDetailText.Text = summary;
-            AttestationDetailText.Foreground = pass
-                ? (Brush)FindResource("OkBrush")
-                : (Brush)FindResource("WarnBrush");
+            SetBrushResource(
+                AttestationDetailText,
+                TextElement.ForegroundProperty,
+                pass ? "OkBrush" : "WarnBrush");
 
             if (!silent)
             {
@@ -368,7 +371,6 @@ public partial class MainWindow : Window
         var dialog = new Window
         {
             Title = "Prepare EZ Flash USB",
-            Content = panel,
             SizeToContent = SizeToContent.WidthAndHeight,
             WindowStartupLocation = WindowStartupLocation.CenterOwner,
             Owner = Application.Current.MainWindow,
@@ -405,4 +407,7 @@ public partial class MainWindow : Window
         LogBox.AppendText($"[{DateTime.Now:HH:mm:ss}] {message}{Environment.NewLine}");
         LogBox.ScrollToEnd();
     }
+
+    private static void SetBrushResource(FrameworkElement target, DependencyProperty property, string resourceKey) =>
+        target.SetResourceReference(property, resourceKey);
 }
