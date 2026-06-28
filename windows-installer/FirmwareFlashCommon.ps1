@@ -7,7 +7,7 @@ $script:OfferedFirmwareVersion = 0x321
 $script:StockSha = 'DC7E5984FB4A39DE84204F54F6D8A95B04DFECDF3AA32D45D0AA904272AD3273'
 $script:PatchedSha = '37ED09073A01F2C6892603231BC9AB72164734ADD9D1D78A4D58E60E2049C316'
 $script:LastAttemptStatusUnsuccessful = 0xC0000001
-$script:PayloadVersion = '1.3.1'
+$script:PayloadVersion = '1.3.2'
 
 function Get-Sha256Hex([byte[]]$Bytes) {
     [BitConverter]::ToString(

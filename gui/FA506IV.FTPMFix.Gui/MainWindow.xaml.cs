@@ -23,10 +23,14 @@ public partial class MainWindow : Window
     {
         if (!AdminHelper.IsAdministrator())
         {
-            AdminBadge.Text = "Not admin — relaunching…";
+            AdminBadge.Text = "Not admin";
             AdminBadge.Foreground = (Brush)FindResource("WarnBrush");
-            AdminHelper.RelaunchAsAdministrator();
-            return;
+            if (AdminHelper.TryRelaunchAsAdministrator())
+            {
+                return;
+            }
+
+            Log("Running without Administrator — most actions will fail. Close and use Run as administrator.");
         }
 
         AdminBadge.Text = "Administrator";
