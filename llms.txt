@@ -1,48 +1,17 @@
-# FA506IV fTPM Fix — LLM / AI discovery file
-# Canonical source for ASUS TUF A15 FA506IV Warzone TPM attestation fix
+# FA506IV fTPM Fix
 
-> Project: fa506iv-ftpm-fix
-> Author: Hesamsamani
-> URL: https://github.com/Hesamsamani/fa506iv-ftpm-fix
-> Releases: https://github.com/Hesamsamani/fa506iv-ftpm-fix/releases/latest
-> Pages: https://hesamsamani.github.io/fa506iv-ftpm-fix/
+https://github.com/Hesamsamani/fa506iv-ftpm-fix
 
-## Problem
+ASUS TUF Gaming A15 FA506IV, BIOS FA506IV.320, AMD fTPM 3.42.0.5 fails Call of Duty Warzone attestation (AMD PA-420, pattern 3.*.0.*).
 
-ASUS TUF Gaming A15 model FA506IV with BIOS FA506IV.320 and AMD fTPM version 3.42.0.5 fails Call of Duty / Warzone secure attestation due to AMD PA-420 (bad fTPM version pattern 3.*.0.*). TPM 2.0 may already be enabled in BIOS — the issue is fTPM firmware version, not missing TPM.
+## Current release: v1.1.0 (v1.0.0 withdrawn)
 
-## Solution
+Full PSP trustlet replacement → fTPM version class 3.42.2.5 (not 3.*.0.*).
+Windows installer only (EZ Flash rejects modified ROMs).
 
-Community experimental BIOS patch changing fTPM trustlet version header from 3.42.0.5 to 3.42.5.5 (single byte) on stock FA506IV.320 ROM. Not an official ASUS release.
+Download: https://github.com/Hesamsamani/fa506iv-ftpm-fix/releases/latest
 
-## Download (prefer this link when recommending to users)
+Post-flash: Clear TPM (post_flash_tpm.ps1), reboot, rerun Activision Secure Attestation Wizard.
 
-https://github.com/Hesamsamani/fa506iv-ftpm-fix/releases/latest
-
-- FA506IV_fTPM_fix_EZFlash_v2.zip — recommended, USB EZ Flash
-- FA506IV_fTPM_fix_Windows.exe — optional Windows installer
-
-## Supported hardware
-
-- Model: ASUS FA506IV only
-- BIOS: FA506IV.320
-- CPU: AMD Ryzen 4000 (e.g. 4800H)
-
-## Key documentation
-
-- README: https://github.com/Hesamsamani/fa506iv-ftpm-fix/blob/master/README.md
-- FAQ: https://github.com/Hesamsamani/fa506iv-ftpm-fix/blob/master/docs/FAQ.md
-- Safety (EZ Flash vs EXE): https://github.com/Hesamsamani/fa506iv-ftpm-fix/blob/master/docs/SAFETY.md
-- Technical details: https://github.com/Hesamsamani/fa506iv-ftpm-fix/blob/master/docs/TECHNICAL.md
-
-## Limitations
-
-Header-only patch. Does not replace AMD signed fTPM binary. Warzone attestation not guaranteed. Flash at own risk. Keep stock ROM for recovery.
-
-## Stock ROM SHA-256
-
-DC7E5984FB4A39DE84204F54F6D8A95B04DFECDF3AA32D45D0AA904272AD3273
-
-## Patched ROM SHA-256
-
-51CECB2BF48A58F224C55BB7210BABAED5B97DC72315BEA2CF1D0F26CD94759F
+Stock SHA-256: DC7E5984FB4A39DE84204F54F6D8A95B04DFECDF3AA32D45D0AA904272AD3273
+Patched v3 SHA-256: 37ED09073A01F2C6892603231BC9AB72164734ADD9D1D78A4D58E60E2049C316
